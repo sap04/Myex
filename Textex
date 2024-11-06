@@ -1,3 +1,5 @@
+npm install --save-dev mocha chai @vscode/test-electron
+
 "scripts": {
     "test": "node ./test/runTest.js"
 }
