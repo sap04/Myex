@@ -1,0 +1,64 @@
+"scripts": {
+    "test": "node ./test/runTest.js"
+}
+const path = require('path');
+const { runTests } = require('@vscode/test-electron');
+
+async function main() {
+    try {
+        // Path to the extension's root directory
+        const extensionDevelopmentPath = path.resolve(__dirname, '../');
+
+        // Path to the folder containing the test cases
+        const extensionTestsPath = path.resolve(__dirname, './suite/index');
+
+        // Run the tests in VS Code
+        await runTests({ extensionDevelopmentPath, extensionTestsPath });
+    } catch (err) {
+        console.error('Failed to run tests');
+        process.exit(1);
+    }
+}
+
+main();
+
+const assert = require('chai').assert;
+const vscode = require('vscode');
+
+describe("Code Runner Extension Tests", function () {
+    before(async () => {
+        // Activate the extension before running tests
+        const extension = vscode.extensions.getExtension("formulahendry.code-runner");
+        await extension.activate();
+    });
+
+    it("should run a Python snippet and check output", async function () {
+        // Open a new untitled Python document
+        const document = await vscode.workspace.openTextDocument({ content: "print('Hello, world!')", language: "python" });
+        await vscode.window.showTextDocument(document);
+
+        // Run Code Runner command to execute code in the active editor
+        await vscode.commands.executeCommand("code-runner.run");
+
+        // Wait for output in the terminal
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Adjust delay if needed
+
+        // Access the terminal's output (mocked here for simplicity; real code may need different access)
+        const terminal = vscode.window.activeTerminal;
+        assert(terminal, "Active terminal should exist");
+        
+        let outputText = "";
+        await new Promise((resolve) => {
+            const onDidWriteData = terminal.onDidWriteData((data) => {
+                outputText += data;
+                if (outputText.includes("Hello, world!")) {
+                    onDidWriteData.dispose();
+                    resolve();
+                }
+            });
+        });
+
+        // Assert that output contains expected text
+        assert.include(outputText, "Hello, world!", "The terminal output should contain 'Hello, world!'");
+    });
+});
