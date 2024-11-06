@@ -1,5 +1,32 @@
 npm install --save-dev mocha chai @vscode/test-electron
 
+const vscode = require('vscode');
+
+function activate(context) {
+    // Log that the extension has been activated
+    console.log('Extension "example" is now active!');
+
+    // Register a command
+    let disposable = vscode.commands.registerCommand('extension.helloWorld', function () {
+        // Show a message when the command is run
+        vscode.window.showInformationMessage('Hello World from your VS Code extension!');
+    });
+
+    // Push the disposable command into the context's subscriptions to ensure it gets cleaned up
+    context.subscriptions.push(disposable);
+}
+
+function deactivate() {
+    // Log that the extension is deactivated (optional cleanup)
+    console.log('Extension "example" is now deactivated!');
+}
+
+// Export the activate and deactivate functions
+module.exports = {
+    activate,
+    deactivate
+};
+
 "scripts": {
     "test": "node ./test/runTest.js"
 }
