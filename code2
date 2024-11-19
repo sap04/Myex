@@ -1,0 +1,39 @@
+*** Settings ***
+Library    AppiumLibrary
+Library    OperatingSystem    # For platform-specific paths
+
+*** Variables ***
+${APPIUM_SERVER_URL}    http://127.0.0.1:4723/wd/hub
+${WINDOWS_APP_PATH}     C:/Program Files/Microsoft VS Code/Code.exe
+${MAC_APP_PATH}         /Applications/Visual Studio Code.app
+${LINUX_APP_PATH}       /usr/share/code/code
+
+*** Test Cases ***
+Launch and Perform Actions on VS Code
+    [Documentation]    Launch VS Code on all platforms and perform basic actions.
+    ${platform}    Evaluate    sys.platform    sys
+    IF    "${platform}" == "win32"
+        Open Application    ${APPIUM_SERVER_URL}    platformName=Windows    app=${WINDOWS_APP_PATH}
+    ELSE IF    "${platform}" == "darwin"
+        Open Application    ${APPIUM_SERVER_URL}    platformName=macOS    app=${MAC_APP_PATH}
+    ELSE IF    "${platform}" == "linux"
+        Open Application    ${APPIUM_SERVER_URL}    platformName=Linux    app=${LINUX_APP_PATH}
+    END
+
+    Sleep    2
+    Log    Application Launched
+
+    # Perform Actions (Replace locators with your app's UI locators)
+    Perform File Actions
+
+    Close Application
+
+*** Keywords ***
+Perform File Actions
+    [Documentation]    Interact with the file open dialog in VS Code or IntelliJ.
+    Click Element    //button[@id="open_file"]   # Replace with actual locator
+    Sleep    1
+    Input Text    //input[@name="file_path"]    /path/to/your/file.txt
+    Sleep    1
+    Click Element    //button[@id="open"]       # Replace with actual locator
+    Log    File Opened Successfully
